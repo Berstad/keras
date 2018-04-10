@@ -143,7 +143,7 @@ def model_to_dot(model,
             label = class_name
 
         if show_layer_numbers:
-            label = label + " ,#" + layer_num
+            label = label + " ,#" + str(layer_num)
         # Rebuild the label as a table including input/output shapes.
         if show_shapes:
             try:
