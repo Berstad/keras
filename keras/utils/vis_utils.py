@@ -52,7 +52,8 @@ def model_to_dot(model,
                  rankdir='TB',
                  expand_nested=False,
                  dpi=96,
-                 subgraph=False):
+                 subgraph=False,
+                 show_layer_numbers=True):
     """Convert a Keras model to dot format.
 
     # Arguments
@@ -66,6 +67,7 @@ def model_to_dot(model,
         expand_nested: whether to expand nested models into clusters.
         dpi: dot DPI.
         subgraph: whether to return a pydot.Cluster instance.
+        show_layer_numbers: whether to to display the layer numbers
 
     # Returns
         A `pydot.Dot` instance representing the Keras model or
@@ -98,6 +100,7 @@ def model_to_dot(model,
             model.build()
     layers = model._layers
 
+    layer_num = 0
     # Create graph nodes.
     for i, layer in enumerate(layers):
         layer_id = str(id(layer))
@@ -139,6 +142,8 @@ def model_to_dot(model,
         else:
             label = class_name
 
+        if show_layer_numbers:
+            label = label + " ,#" + layer_num
         # Rebuild the label as a table including input/output shapes.
         if show_shapes:
             try:
@@ -159,6 +164,7 @@ def model_to_dot(model,
         if not expand_nested or not isinstance(layer, Model):
             node = pydot.Node(layer_id, label=label)
             dot.add_node(node)
+            layer_num += 1
 
     # Connect nodes with edges.
     for layer in layers:
@@ -217,7 +223,8 @@ def plot_model(model,
                show_layer_names=True,
                rankdir='TB',
                expand_nested=False,
-               dpi=96):
+               dpi=96,
+               show_layer_numbers=False):
     """Converts a Keras model to dot format and save to a file.
 
     # Arguments
@@ -231,13 +238,14 @@ def plot_model(model,
             'LR' creates a horizontal plot.
         expand_nested: whether to expand nested models into clusters.
         dpi: dot DPI.
+        show_layer_numbers: whether to display the layer numbers
 
     # Returns
         A Jupyter notebook Image object if Jupyter is installed.
         This enables in-line display of the model plots in notebooks.
     """
     dot = model_to_dot(model, show_shapes, show_layer_names, rankdir,
-                       expand_nested, dpi)
+                       expand_nested, dpi, show_layer_numbers)
     _, extension = os.path.splitext(to_file)
     if not extension:
         extension = 'png'
